@@ -1,0 +1,39 @@
+1. Initialize Bank with 5 accounts, max balance 1000.
+Expected: All accounts should be initialized correctly.
+
+2. Print balance of account 0.
+Command: print_balance 0
+Expected: Current balance: 0, Minimum balance: 0, Maximum balance: 1000
+
+3. Freeze account 1.
+Command: freeze_account 1
+Expected: Successfully ended
+
+4. Transfer 500 from account 0 to account 1 (should fail since account 0 has insufficient funds).
+Command: transfer 0 1 500
+Expected: Wrong command, please try it again later
+
+5. Transfer 100 from account 0 to account 1.
+Command: transfer 0 1 100
+Expected: Wrong command, please try it again later (since account 1 is frozen)
+
+6. Unfreeze account 1 and transfer 100 from account 0 to account 1.
+Command: unfreeze_account 1
+Command: transfer 0 1 100
+Expected: Successfully ended
+
+7. Modify all balances by adding 50.
+Command: modify_all_balances 50
+Expected: Successfully ended (if all accounts have enough balance limits)
+
+8. Set min balance of account 0 to -100.
+Command: set_min_balance 0 -100
+Expected: Successfully ended
+
+9. Set max balance of account 0 to 2000.
+Command: set_max_balance 0 2000
+Expected: Successfully ended
+
+10. Server: Process 5 commands and log request count.
+Commands: Any valid set of commands
+Expected: Log request count after every 5 commands.
