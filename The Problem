@@ -1,0 +1,74 @@
+#include <iostream>
+#include <semaphore.h> 
+#include <pthread.h>
+#include <vector>
+
+const int SIZE = 8;
+
+sem_t empty;
+sem_t full;
+sem_t lock;
+std::vector<char> buffer(SIZE, 0);
+int in = 0;
+int out = 0;
+
+
+void* produce(void* arg)
+{
+ char c = *((char*)arg);
+ for(int i = 0; i < 2; ++i)
+ {
+  sem_wait(&empty);
+  sem_wait(&lock);
+  buffer[in] = c;
+  in = (in + 1) % SIZE;
+  std::cout << "produced: " << c << std::endl;
+  sem_post(&lock);
+  sem_post(&full);
+ }
+ return nullptr;
+}
+
+void* consume(void* arg)
+{
+ for(int i = 0; i < 2; ++i) 
+ {
+  sem_wait(&full);
+  sem_wait(&lock);
+  char c = buffer[out];
+  out = (out + 1) % SIZE;
+  std::cout << "consumed: " << c << std::endl;
+  sem_post(&lock);
+  sem_post(&empty);
+ }
+ return nullptr;
+}
+
+int main()
+{
+ sem_init(&empty, 0, SIZE);
+ sem_init(&full, 0, 0);
+ sem_init(&lock, 0, 1);
+
+ std::vector<pthread_t> threads(20);
+ std::vector<char> data{'a','b','c','d','e','f','g','h','i','j'};
+ for(int i = 0; i < 20; i+=2)
+ {
+  pthread_create(&threads[i], nullptr, produce, &data[i/2]);
+  pthread_create(&threads[i+1], nullptr, consume, &data[i/2]);
+ }
+
+ for(int i = 0; i < 20; ++i)
+ {
+  pthread_join(threads[i], nullptr); 
+ }
+
+
+ sem_destroy(&empty);
+ sem_destroy(&full);
+ sem_destroy(&lock);
+
+ return 0;
+}
+
+Решите эту задачу с использованием условной(ых) переменной(ых) (conditional variable)
